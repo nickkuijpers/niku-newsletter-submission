@@ -30,8 +30,6 @@ class niku_contacts
 	 	// register and initialize the custom post type for the e-mail adresses
 	    add_action( 'init', array( $this, 'register_custom_post_type' ) );	     
 
-	    add_action( 'wp_footer', array( $this, 'nieuwsbrief_status' ) );	     
-
 	    // Check if the e-mail already exists
 	    $this->check_if_new_contact();
 
@@ -40,55 +38,7 @@ class niku_contacts
 
 	}
 
-	/**
-	 * Display success or failure status
-	 */
-	public function nieuwsbrief_status()
-	{
-
-		if( !empty( $_COOKIE['nieuwsbrief'] )){
-
-			$status = $_COOKIE['nieuwsbrief'];
-			setcookie("nieuwsbrief", '');
-
-			if( $status == 'success' ){
-
-				echo '
-				<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" id="mySmallModalLabel" aria-labelledby="mySmallModalLabel">
-				  <div class="modal-dialog modal-sm">
-				     <div class="modal-content">
-				      <div class="modal-header">
-				        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				        <h4 class="modal-title">Nieuwsbrief</h4>
-				      </div>
-				      <div class="modal-body">
-				        <p>Bedankt voor uw inschrijving!</p>
-				      </div>
-				      <div class="modal-footer">
-				        <button type="button" class="btn btn-default" data-dismiss="modal">Sluiten</button>        
-				      </div>
-				    </div><!-- /.modal-content -->
-				  </div>
-				</div>
-				<script type="text/javascript">
-				    $(window).load(function(){
-				        $("#mySmallModalLabel").modal("show");
-				    });
-				</script>
-				';
-
-			} else if( $status == 'failure') {
-
-				echo '<script>alert("failure");</script>';
-
-			}
-
-
-
-		}		
-
-	}
-
+	 
 
 	/**
 	 * Add the e-mail metabox
@@ -120,16 +70,7 @@ class niku_contacts
 		        'search_items' => __( 'Doorzoek contacten' ),
 		        'not_found' => __( 'Geen contacten gevonden' ),
 		        'menu_name' => __( 'Contacten' ),
-		      ),
-		      /*'capabilities' => array(
-				    'edit_post'          => 'update_core',
-				    'read_post'          => 'update_core',
-				    'delete_post'        => 'update_core',
-				    'edit_posts'         => 'update_core',
-				    'edit_others_posts'  => 'update_core',
-				    'publish_posts'      => 'update_core',
-				    'read_private_posts' => 'update_core'
-			  ),*/
+		      ),		      
 		      'description' => __('Contacten'),
 		      'public' => false,
 		      'show_in_admin_bar' => false,
@@ -150,6 +91,35 @@ class niku_contacts
 	 * Add the form to the shortcode 
 	 */	
 	public function custom_shortcode( ) {
+
+		if( $this->success == true ){
+
+			echo '
+			<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" style="z-index:99999;" id="mySmallModalLabel" aria-labelledby="mySmallModalLabel">
+			  <div class="modal-dialog modal-sm" style="z-index:999999;">
+			     <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title">Nieuwsbrief</h4>
+			      </div>
+			      <div class="modal-body">
+			        <p style="color:#000;">Bedankt voor uw inschrijving!</p>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" data-dismiss="modal">Sluiten</button>        
+			      </div>
+			    </div><!-- /.modal-content -->
+			  </div>
+			</div>
+			<script type="text/javascript">
+			    $(window).load(function(){
+			        $("#mySmallModalLabel").modal("show");
+			    });
+			</script>
+			';	
+
+		}
+
 
 		$return = '';
 		$return .= 	'<form class="nieuwsbrief" method="post" action=""><a name="nieuwsbrief"></a>';
@@ -234,8 +204,7 @@ class niku_contacts
 
 					if ( is_email( $emailaddress ) ) {
 
-						$this->success = true;
-						setcookie("nieuwsbrief", 'success');						
+						$this->success = true;												
 
 						$my_post = array(
 						  	'post_title'    => $emailaddress,
@@ -248,9 +217,7 @@ class niku_contacts
 
 					} else {
 
-						$this->send = false;
-						setcookie("nieuwsbrief", 'failure');
-						$_SESSION['nieuwsbrief'] = 'failure';
+						$this->send = false;						
 
 					}
 
