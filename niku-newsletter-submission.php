@@ -10,6 +10,18 @@
  * License GPL2
  */
 
+/*
+|--------------------------------------------------------------------------
+| Overriding the form
+|--------------------------------------------------------------------------
+|
+| You can override the HTML of the form by creating using a filter in
+| the theme functions.php. Make sure you use the name emailaddress
+| in the form field.
+|
+| The filtername is niku_newsletter_submission
+|
+*/
 
 /**
  * NIKU Contacts
@@ -120,7 +132,6 @@ class niku_contacts
 
 		}
 
-
 		$return = '';
 		$return .= 	'<form class="nieuwsbrief" method="post" action=""><a name="nieuwsbrief"></a>';
 		$return .=	'	<div class="input-group">';		
@@ -131,7 +142,13 @@ class niku_contacts
 		$return .=  '	</div>';
 		$return .=	'</form>';
 
-		return $return;
+		$return = apply_filters( 'niku_newsletter_submission', $return );
+
+		$form = '<form class="nieuwsbrief" method="post" action=""><a name="nieuwsbrief"></a>';
+		$form .= $return;
+		$form .= '</form>';
+
+		return $form;
 
 	}
 	
